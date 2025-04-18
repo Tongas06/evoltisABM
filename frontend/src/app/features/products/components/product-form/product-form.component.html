@@ -1,0 +1,49 @@
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+  <div class="p-fluid p-formgrid grid">
+    
+    <div class="field col-12">
+      <label for="name">Nombre</label>
+      <input pInputText id="name" formControlName="name" aria-describedby="name-help"
+             [ngClass]="{'ng-invalid ng-dirty': name?.invalid && (name?.dirty || name?.touched)}" />
+      <small id="name-help" class="p-error" *ngIf="name?.invalid && (name?.dirty || name?.touched)">
+        <span *ngIf="name?.errors?.['required']">El nombre es requerido.</span>
+        <span *ngIf="name?.errors?.['maxlength']">El nombre no puede exceder los 100 caracteres.</span>
+      </small>
+    </div>
+    
+    <div class="field col-12 md:col-6">
+      <label for="price">Precio</label>
+      <p-inputNumber id="price" formControlName="price" mode="currency" currency="USD" locale="en-US"
+                     inputId="currency-us" aria-describedby="price-help"
+                     [ngClass]="{'ng-invalid ng-dirty': price?.invalid && (price?.dirty || price?.touched)}">
+      </p-inputNumber>
+       <small id="price-help" class="p-error" *ngIf="price?.invalid && (price?.dirty || price?.touched)">
+           <span *ngIf="price?.errors?.['required']">El precio es requerido.</span>
+           <span *ngIf="price?.errors?.['min']">El precio debe ser positivo.</span>
+       </small>
+    </div>
+     
+     <div class="field col-12">
+        <label for="description">Descripción</label>
+        <textarea pInputTextarea id="description" formControlName="description" rows="3"
+                  aria-describedby="description-help"
+                  [ngClass]="{'ng-invalid ng-dirty': description?.invalid && (description?.dirty || description?.touched)}">
+        </textarea>
+         <small id="description-help" class="p-error" *ngIf="description?.invalid && (description?.dirty || description?.touched)">
+            <span *ngIf="description?.errors?.['required']">La descripción es requerida.</span>
+             <span *ngIf="description?.errors?.['maxlength']">La descripción no puede exceder los 500 caracteres.</span>
+         </small>
+    </div>
+
+  </div>
+  
+  <div class="mt-4 flex justify-content-end">
+     <button pButton pRipple type="button" label="Cancelar" icon="pi pi-times"
+             class="p-button-text mr-2" (click)="onCancel()"></button>
+     <button pButton pRipple type="submit" [label]="isEditMode ? 'Actualizar' : 'Crear'"
+             [icon]="isSaving ? 'pi pi-spin pi-spinner' : (isEditMode ? 'pi pi-check' : 'pi pi-plus')"
+             [disabled]="productForm.invalid || isSaving"
+             class="p-button-success"></button>
+  </div>
+
+</form>

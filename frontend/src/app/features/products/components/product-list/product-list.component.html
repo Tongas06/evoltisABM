@@ -1,0 +1,106 @@
+<div *ngIf="loading">
+  Cargando productos... <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="8"></p-progressSpinner>
+</div>
+
+<div *ngIf="error" class="p-message p-message-error">
+  Error al cargar productos: {{ error?.message || error }}
+</div>
+
+<p-table
+  *ngIf="!loading && !error && products"
+  #productTable
+  [value]="products"
+  [columns]="cols"
+  dataKey="id"
+  styleClass="p-datatable-striped p-datatable-sm"
+  [rows]="10"
+  [paginator]="true"
+  [globalFilterFields]="['name', 'description']"
+  [rowsPerPageOptions]="[10, 25, 50]"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} productos"
+>
+  <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between">
+          <h5 class="m-0">Administrar Productos</h5>
+          <span class="p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                #filterInput
+                (input)="productTable.filterGlobal(filterInput.value, 'contains')"
+                placeholder="Buscar producto..."
+              />              
+              <button *ngIf="filterInput.value" pButton type="button" icon="pi pi-times" class="p-button-text" (click)="filterInput.value=''; productTable.filterGlobal('', 'contains')"></button>
+          </span>
+      </div>
+  </ng-template>
+
+  <ng-template pTemplate="header" let-columns>
+    <tr>
+      <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+        {{ col.header }} <p-sortIcon [field]="col.field"></p-sortIcon>
+      </th>
+      <th>Acciones</th>
+    </tr>     
+     <tr>
+        <th *ngFor="let col of columns" [ngSwitch]="col.field">          
+           <p-columnFilter
+            *ngSwitchCase="'name'"
+            type="text"
+            [field]="col.field"
+            matchMode="contains"
+            [showMenu]="false"
+            placeholder="Filtrar por {{col.header}}">            
+          </p-columnFilter>
+           <p-columnFilter
+            *ngSwitchCase="'description'"
+            type="text"
+            [field]="col.field"
+            matchMode="contains"
+            [showMenu]="false"
+            placeholder="Filtrar por {{col.header}}">             
+          </p-columnFilter>           
+           <p-columnFilter
+            *ngSwitchCase="'price'"
+             type="numeric"
+             [field]="col.field"
+             matchMode="equals"
+             [showMenu]="false"
+             placeholder="Filtrar por {{col.header}}">             
+            </p-columnFilter>
+        </th>
+        <th></th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-product let-columns="columns">
+    <tr>
+      <td *ngFor="let col of columns">          
+           <ng-container *ngIf="col.field === 'price'; else defaultCell">
+               {{ product[col.field] | currency:'USD':'symbol':'1.2-2' }}
+           </ng-container>
+           <ng-template #defaultCell>
+               {{ product[col.field] }}
+           </ng-template>
+      </td>
+      <td>
+        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="onEdit(product)"></button>
+        <button pButton pRipple icon="pi pi-trash"  class="p-button-rounded p-button-danger" (click)="onDelete(product.id)"></button>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+      <tr>
+          <td [attr.colspan]="cols.length + 1">
+            No se encontraron productos que coincidan con el filtro.
+          </td>
+      </tr>
+  </ng-template>
+
+   <ng-template pTemplate="paginatorleft">                
+    </ng-template>
+
+</p-table>
